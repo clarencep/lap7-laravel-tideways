@@ -1,0 +1,21 @@
+sudo: required
+
+language: python
+
+services:
+  - docker
+
+before_script:
+  - python --version
+  - docker version
+  - docker ps -a
+  - docker build -t clarencep/lap7 .
+  - docker images
+  - docker ps -a
+
+script:
+  - docker run -d -p 8080:80 --name test clarencep/lap7
+  - docker ps 
+  - docker exec test ps -elf
+  - curl -v http://localhost:8080/ || curl -v http://localhost:8080/ || curl -v http://localhost:8080/
+  - docker exec test php -r '$exts = "tokenizer|mbstring|pdo_mysql|openssl|mcrypt|xml|dom|redis|tideways"; $missing = array_map(function($m){ return !extension_loaded($m) ? $m : ""; }, explode("|", $exts)); $missing = array_filter($missing); if ($missing) { echo "Error: Missing PHP extesions: " . implode(",", $missing) . "\n"; exit(1); }'
